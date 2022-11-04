@@ -435,15 +435,11 @@ const Swiper = (
   }, [isVertical, width, height, offset, ready])
 
   useEffect(() => {
-    if (ready) {
-      stopAutoPlay()
-      autoplay()
-    }
     return () => {
       setReady(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready])
+  }, [])
 
   useEffect(() => {
     stopAutoPlay()
@@ -463,8 +459,12 @@ const Swiper = (
   }, [])
 
   useReady(() => {
+    init()
     Taro.nextTick(() => {
-      init()
+      setTimeout(() => {
+        stopAutoPlay()
+        autoplay()
+      }, 16)
     })
   })
 
@@ -476,6 +476,7 @@ const Swiper = (
       style[_direction === 'horizontal' ? 'width' : 'height'] = `${_size}px`
     }
     const offset = childOffset[index]
+
     if (offset) {
       style.transform = `translate3D${
         _direction === 'horizontal' ? `(${offset}px,0,0)` : `(0,${offset}px,0)`
@@ -519,6 +520,11 @@ const Swiper = (
               </View>
             )
           })}
+          {process.env.TARO_ENV !== 'h5' && (
+            <View className={'van-swiper-item-wrapper'} style={itemStyle(0)}>
+              {childs && childs.length ? childs[0] : ''}
+            </View>
+          )}
         </View>
         {propSwiper.paginationVisible && !('pageContent' in propSwiper) ? (
           <View
